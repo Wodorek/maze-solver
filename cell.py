@@ -13,6 +13,7 @@ class Cell:
         self._x2, self._y2 = max(p1.x, p2.x), max(p1.y, p2.y)
 
         self._win = window
+        self.visited = False
 
     def draw(self, fill_color):
         left_color = fill_color if self.has_left_wall else 'white'

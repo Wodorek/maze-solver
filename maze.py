@@ -1,4 +1,5 @@
 import time
+import random
 from cell import Cell
 from point import Point
 
@@ -14,6 +15,7 @@ class Maze:
         cell_size_x,
         cell_size_y,
         win=None,
+        seed=None
     ):
         self.x1 = x1
         self.y1 = y1
@@ -24,6 +26,10 @@ class Maze:
         self.win = win
         self.cells = []
         self._create_cells()
+        if seed:
+            self.seed = random.seed(seed)
+
+        self._break_walls_r(0, 0)
 
     def _create_cells(self):
         matrix = []
@@ -68,3 +74,65 @@ class Maze:
 
         self._draw_cell(0, 0)
         self._draw_cell(-1, -1)
+
+    def _unvisited_neighbors(self, i, j):
+        neigbors = []
+
+        # left
+        if j-1 >= 0:
+            cell = self.cells[i][j-1]
+            if not cell.visited:
+                neigbors.append(('left', i, j-1))
+
+        # top
+        if i-1 >= 0:
+            cell = self.cells[i-1][j]
+            if not cell.visited:
+                neigbors.append(('top', i-1, j))
+
+        # right
+        if j+1 < self.num_cols:
+            cell = self.cells[i][j+1]
+            if not cell.visited:
+                neigbors.append(('right', i, j+1))
+        # bottom
+        if i+1 < self.num_rows:
+            cell = self.cells[i+1][j]
+            if not cell.visited:
+                neigbors.append(('bot', i+1, j))
+
+        return neigbors
+
+    def _break_walls_r(self, i, j):
+
+        cell = self.cells[i][j]
+        cell.visited = True
+
+        while True:
+            neighbors = self._unvisited_neighbors(i, j)
+            if len(neighbors) == 0:
+                self._draw_cell(i, j)
+                return
+
+            select = random.randrange(0, len(neighbors))
+            print('nn', neighbors)
+            move_dir, x, y = neighbors[select]
+            moving_to = self.cells[x][y]
+
+            if move_dir == 'left':
+                cell.has_left_wall = False
+                moving_to.has_right_wall = False
+
+            if move_dir == 'top':
+                cell.has_top_wall = False
+                moving_to.has_bottom_wall = False
+
+            if move_dir == 'right':
+                cell.has_right_wall = False
+                moving_to.has_left_wall = False
+
+            if move_dir == 'bot':
+                cell.has_bottom_wall = False
+                moving_to.has_top_wall = False
+
+            self._break_walls_r(x, y)
