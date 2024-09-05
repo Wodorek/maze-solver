@@ -1,10 +1,9 @@
 from line import Line
 from point import Point
-import math
 
 
 class Cell:
-    def __init__(self, window, p1, p2):
+    def __init__(self, p1, p2, window=None):
         self.has_left_wall = True
         self.has_top_wall = True
         self.has_right_wall = True
@@ -16,18 +15,26 @@ class Cell:
         self._win = window
 
     def draw(self, fill_color):
-        if self.has_left_wall:
-            Line(Point(self._x1, self._y1), Point(self._x1, self._y2)).draw(
-                self._win.canvas, fill_color)
-        if self.has_bottom_wall:
-            Line(Point(self._x1, self._y2), Point(self._x2, self._y2)).draw(
-                self._win.canvas, fill_color)
-        if self.has_top_wall:
-            Line(Point(self._x1, self._y1), Point(self._x2, self._y1)).draw(
-                self._win.canvas, fill_color)
-        if self.has_right_wall:
-            Line(Point(self._x2, self._y1), Point(self._x2, self._y2)).draw(
-                self._win.canvas, fill_color)
+        left_color = fill_color if self.has_left_wall else 'white'
+        right_color = fill_color if self.has_right_wall else 'white'
+        top_color = fill_color if self.has_top_wall else 'white'
+        bottom_color = fill_color if self.has_bottom_wall else 'white'
+
+        if not self._win:
+            return
+
+# left wall
+        Line(Point(self._x1, self._y1), Point(self._x1, self._y2)).draw(
+            self._win.canvas, left_color)
+# bottom wall
+        Line(Point(self._x1, self._y2), Point(self._x2, self._y2)).draw(
+            self._win.canvas, bottom_color)
+# top wall
+        Line(Point(self._x1, self._y1), Point(self._x2, self._y1)).draw(
+            self._win.canvas, top_color)
+# right wall
+        Line(Point(self._x2, self._y1), Point(self._x2, self._y2)).draw(
+            self._win.canvas, right_color)
 
     def draw_move(self, target, undo=False):
 
