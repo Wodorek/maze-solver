@@ -30,6 +30,7 @@ class Maze:
             self.seed = random.seed(seed)
 
         self._break_walls_r(0, 0)
+        self._reset_cells_visited()
 
     def _create_cells(self):
         matrix = []
@@ -56,7 +57,7 @@ class Maze:
         if not self.win:
             return
         self.win.redraw()
-        time.sleep(0.02)
+        time.sleep(0.01)
 
     def _draw_cell(self, i, j):
 
@@ -136,3 +137,64 @@ class Maze:
                 moving_to.has_top_wall = False
 
             self._break_walls_r(x, y)
+
+    def _reset_cells_visited(self):
+
+        for row in self.cells:
+            for cell in row:
+                cell.visited = False
+
+    def solve(self):
+        return self._solve_r(0, 0, self.cells[-1][-1])
+
+    def _solve_r(self, i, j, end):
+        self._animate()
+
+        curr_cell = self.cells[i][j]
+        curr_cell.visited = True
+
+        if self.cells[i][j] == end:
+            return True
+
+        neighbors = self._unvisited_neighbors(i, j)
+
+        for neighbor in neighbors:
+            move_dir, x, y = neighbor
+
+            moving_to = self.cells[x][y]
+
+            if move_dir == 'left':
+                if not curr_cell.has_left_wall and not moving_to.has_right_wall:
+                    curr_cell.draw_move(moving_to)
+                    s = self._solve_r(x, y, end)
+                    if s:
+                        return True
+                    if not s:
+                        curr_cell.draw_move(moving_to, True)
+
+            if move_dir == 'right':
+                if not curr_cell.has_right_wall and not moving_to.has_left_wall:
+                    curr_cell.draw_move(moving_to)
+                    s = self._solve_r(x, y, end)
+                    if s:
+                        return True
+                    if not s:
+                        curr_cell.draw_move(moving_to, True)
+
+            if move_dir == 'top':
+                if not curr_cell.has_top_wall and not moving_to.has_bottom_wall:
+                    curr_cell.draw_move(moving_to)
+                    s = self._solve_r(x, y, end)
+                    if s:
+                        return True
+                    if not s:
+                        curr_cell.draw_move(moving_to, True)
+
+            if move_dir == 'bot':
+                if not curr_cell.has_bottom_wall and not moving_to.has_top_wall:
+                    curr_cell.draw_move(moving_to)
+                    s = self._solve_r(x, y, end)
+                    if s:
+                        return True
+                    if not s:
+                        curr_cell.draw_move(moving_to, True)
