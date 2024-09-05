@@ -28,3 +28,16 @@ class Cell:
         if self.has_right_wall:
             Line(Point(self._x2, self._y1), Point(self._x2, self._y2)).draw(
                 self._win.canvas, fill_color)
+
+    def draw_move(self, target, undo=False):
+
+        color = 'grey' if undo else 'red'
+
+        self_center_x = (self._x1 + self._x2) / 2
+        self_center_y = (self._y1 + self._y2) / 2
+
+        target_center_x = (target._x1 + target._x2) / 2
+        target_center_y = (target._y1 + target._y2) / 2
+
+        Line(Point(self_center_x, self_center_y), Point(
+            target_center_x, target_center_y)).draw(self._win.canvas, color)
